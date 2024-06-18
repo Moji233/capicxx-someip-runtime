@@ -23,6 +23,8 @@ namespace SomeIP {
 class Address;
 class Connection;
 
+const uint32_t SOMEIP_E2E_HEADER_SIZE = 12;
+
 class Message {
  public:
     COMMONAPI_EXPORT Message();

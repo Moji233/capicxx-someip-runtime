@@ -127,7 +127,7 @@ Message::getBodyData() const {
         return NULL;
     }
 
-    return payload->get_data();
+    return payload->get_data() + SOMEIP_E2E_HEADER_SIZE;
 }
 
 message_length_t
@@ -138,7 +138,7 @@ Message::getBodyLength() const {
         return 0;
     }
 
-    return payload->get_length();
+    return payload->get_length() - SOMEIP_E2E_HEADER_SIZE;
 }
 
 return_code_e
@@ -178,7 +178,11 @@ Message::setPayloadData(const byte_t* data, message_length_t length) {
         payload = vsomeip::runtime::get()->create_payload();
         message_->set_payload(payload);
     }
-    payload->set_data(data, length);
+    std::vector<byte_t> data_vector(0);
+    data_vector.reserve(SOMEIP_E2E_HEADER_SIZE + length);
+    data_vector.insert(data_vector.end(), SOMEIP_E2E_HEADER_SIZE, 0x00); // Reserve space for vsomeip to store e2e data
+    data_vector.insert(data_vector.end(), data, data + length);
+    payload->set_data(std::move(data_vector)); // reduce once copy
 }
 
 
